@@ -49,14 +49,12 @@ class WebpayNullify
 
       #Firmar documento
       document = sign_xml(req)
-      puts document
 
       begin
         response = @client.call(:nullify) do
           xml document.to_xml(:save_with => 0)
         end
       rescue Exception ,RuntimeError => e
-        puts "Ocurrio un error en la llamada a Webpay: "+e.message
         response_array ={
             "error_desc" => "Ocurrio un error en la llamada a Webpay: "+e.message
         }
@@ -68,13 +66,10 @@ class WebpayNullify
       tbk_cert = OpenSSL::X509::Certificate.new(@webpay_cert)
 
       if !Verifier.verify(response, tbk_cert)
-        puts "El Certificado de respuesta es Invalido."
         response_array ={
             "error_desc" => 'El Certificado de respuesta es Invalido'
         }
         return response_array
-      else
-        puts "El Certificado de respuesta es Valido."
       end
 
 
@@ -94,9 +89,6 @@ class WebpayNullify
           "token" 						=> token.to_s,
           "error_desc"        => 'TRX_OK'
       }
-
-      puts 'respuesta: '
-      puts response_document
 
       return response_array
     end
