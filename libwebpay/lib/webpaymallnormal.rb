@@ -64,15 +64,11 @@ class WebpayMallNormal
     document = sign_xml(req)
     #document = Util.signXml(req)
 
-    puts document
-
     begin
-      puts 'iniciando initMall...'
       response = @client.call(:init_transaction) do
         xml document.to_xml(:save_with => 0)
       end
     rescue Exception, RuntimeError => e
-      puts "Ocurrio un error en la llamada a Webpay: "+e.message
       response_array ={
           "error_desc" => "Ocurrio un error en la llamada a Webpay: "+e.message
       }
@@ -80,19 +76,15 @@ class WebpayMallNormal
     end
 
     token=''
-    puts 'response: '+response.to_s
 
     #Verificacion de certificado respuesta
     tbk_cert = OpenSSL::X509::Certificate.new(@webpay_cert)
 
     if !Verifier.verify(response, tbk_cert)
-      puts "El Certificado de respuesta es Invalido"
       response_array ={
           "error_desc" => 'El Certificado de respuesta es Invalido'
       }
       return response_array
-    else
-      puts "El Certificado de respuesta es Valido."
     end
 
 
@@ -104,10 +96,6 @@ class WebpayMallNormal
     response_document.xpath("//url").each do |url_value|
       url = url_value.text
     end
-
-    puts 'token: '+token
-    puts 'url: '+url
-
 
     response_array ={
         "token" => token.to_s,
@@ -135,13 +123,11 @@ class WebpayMallNormal
 
     #Se realiza el getResult
     begin
-      puts "Iniciando getTransactionResult Mall..."
       response = @client.call(:get_transaction_result) do
         xml document.to_xml(:save_with => 0)
       end
 
     rescue Exception, RuntimeError => e
-      puts "Ocurrio un error en la llamada a Webpay: "+e.message
       response_array ={
           "error_desc" => "Ocurrio un error en la llamada a Webpay: "+e.message
       }
@@ -149,29 +135,21 @@ class WebpayMallNormal
     end
 
     #Se revisa que respuesta no sea nula.
-    if response
-      puts 'Respuesta getResult: '+ response.to_s
-    else
-      puts 'Webservice Webpay responde con null'
+    unless response
       response_array ={
           "error_desc" => 'Webservice Webpay responde con null'
       }
       return response_array
     end
 
-    puts response
-
     #Verificacion de certificado respuesta
     tbk_cert = OpenSSL::X509::Certificate.new(@webpay_cert)
 
     if !Verifier.verify(response, tbk_cert)
-      puts "El Certificado de respuesta es Invalido."
       response_array ={
           "error_desc" => 'Webservice Webpay responde con null'
       }
       return response_array
-    else
-      puts "El Certificado de respuesta es Valido."
     end
 
 
@@ -204,11 +182,7 @@ class WebpayMallNormal
         "error_desc"        => 'TRX_OK'
     }
 
-    puts 'detailOutput: '
-    puts detailOutput[0]
-
     #Realizar el acknowledge
-    puts 'Iniciando acknowledge... '
     acknowledgeTransaction(token)
 
     return response_array
@@ -230,13 +204,11 @@ class WebpayMallNormal
 
     #Se realiza el acknowledge_transaction
     begin
-      puts "Iniciando acknowledge_transaction..."
       response = @client.call(:acknowledge_transaction, message: acknowledgeInput) do
         xml document.to_xml(:save_with => 0)
       end
 
     rescue Exception, RuntimeError => e
-      puts "Ocurrio un error en la llamada a Webpay: "+e.message
       response_array ={
           "error_desc" => "Ocurrio un error en la llamada a Webpay: "+e.message
       }
@@ -244,10 +216,7 @@ class WebpayMallNormal
     end
 
     #Se revisa que respuesta no sea nula.
-    if response
-      puts 'Respuesta acknowledge_transaction: '+ response.to_s
-    else
-      puts 'Webservice Webpay responde con null'
+    unless response
       response_array ={
           "error_desc" => 'Webservice Webpay responde con null'
       }
@@ -258,13 +227,10 @@ class WebpayMallNormal
     tbk_cert = OpenSSL::X509::Certificate.new(@webpay_cert)
 
     if !Verifier.verify(response, tbk_cert)
-      puts "El Certificado de respuesta es Invalido."
       response_array ={
           "error_desc" => 'El Certificado de respuesta es Invalido'
       }
       return response_array
-    else
-      puts "El Certificado de respuesta es Valido."
     end
 
     response_array ={
