@@ -163,6 +163,7 @@ class WebpayMallNormal
 
     #ciclo
     detailOutput     = response.xpath("//detailoutput")
+                               .map { |detail| parseDetailOutput(detail) }
 
     sessionId 			= response.xpath("//sessionid").text
     transactionDate	= response.xpath("//transactiondate").text
@@ -173,8 +174,7 @@ class WebpayMallNormal
         "accountingDate" 	=> accountingDate.to_s,
         "buyOrder" 				=> buyOrder.to_s,
         "cardNumber" 			=> cardNumber.to_s,
-        "detailOutput1" 	=> detailOutput[0].to_s,
-        "detailOutput2" 	=> detailOutput[1].to_s,
+        "detailOutput"    => detailOutput,
         "sessionId" 			=> sessionId.to_s,
         "transactionDate" => transactionDate.to_s,
         "urlRedirection" 	=> urlRedirection.to_s,
@@ -188,7 +188,17 @@ class WebpayMallNormal
     return response_array
   end
 
-
+  def parseDetailOutput(detailOutput)
+    {
+      "sharesnumber"      => detailOutput.xpath("sharesnumber").text,
+      "amount"            => detailOutput.xpath("amount").text,
+      "commercecode"      => detailOutput.xpath("commercecode").text,
+      "buyorder"          => detailOutput.xpath("buyorder").text,
+      "authorizationcode" => detailOutput.xpath("authorizationcode").text,
+      "paymenttypecode"   => detailOutput.xpath("paymenttypecode").text,
+      "responsecode"      => detailOutput.xpath("responsecode").text,
+    }
+  end
 
   ################################
   def acknowledgeTransaction(token)
