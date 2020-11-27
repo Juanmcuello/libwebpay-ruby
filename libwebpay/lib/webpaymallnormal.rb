@@ -158,7 +158,7 @@ class WebpayMallNormal
 
 
     accountingDate 		= response.xpath("//accountingdate").text
-    buyOrder 					= response.xpath("//buyorder").text
+    buyOrder 					= response.xpath("//buyorder")[0].text
     cardNumber 				= response.xpath("//cardnumber").text
 
     #ciclo
