@@ -183,7 +183,11 @@ class WebpayMallNormal
     }
 
     #Realizar el acknowledge
-    acknowledgeTransaction(token)
+    acknoledge_result = acknowledgeTransaction(token)
+
+    unless acknoledge_result['error_desc'] == 'TRX_OK'
+      response_array['error_desc'] = acknoledge_result['error_desc']
+    end
 
     return response_array
   end
